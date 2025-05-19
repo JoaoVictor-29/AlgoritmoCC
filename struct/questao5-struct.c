@@ -20,11 +20,11 @@ void dadosAluno(Aluno *v, int tam){
         printf("Digite o nome do aluno: ");
         scanf("%s", v[i].nome);
         printf("Digite a nota da primeira prova: ");
-        scanf("%f", v[i].prova1);
+        scanf("%f", &v[i].prova1);
         printf("Digite a nota da segunda prova: ");
-        scanf("%f", v[i].prova2);
+        scanf("%f", &v[i].prova2);
         printf("Digite a nota da terceira prova: ");
-        scanf("%f", v[i].prova3);
+        scanf("%f", &v[i].prova3);
     }
 
 }
