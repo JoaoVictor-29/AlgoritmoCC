@@ -19,12 +19,10 @@ void dadosAluno(Aluno *v, int tam){
     for(int i = 0; i < tam; i++){
         printf("Digite o nome do aluno: ");
         scanf("%s", v[i].nome);
-        printf("Digite a nota da primeira prova: ");
-        scanf("%f", &v[i].nota[0]);
-        printf("Digite a nota da segunda prova: ");
-        scanf("%f", &v[i].nota[1]);
-        printf("Digite a nota da terceira prova: ");
-        scanf("%f", &v[i].nota[3]);
+        printf("Digite o número de matricula: ");
+        scanf("%d", &v[i].matricula);
+        printf("Digite as notas: ");
+        scanf("%f %f %f", &v[i].nota[0], &v[i].nota[1], &v[i].nota[2]);
     }
 
 }
