@@ -6,10 +6,13 @@ typedef struct{
 	int idade;
 	float salarioBase;
 	float totalVendido;
+	float comissao;
 }Vendedor;
 
 Vendedor * cadastrarVend(Vendedor *v, int *qtdV);
 void mostrarVend(Vendedor *v, int *qtdV);
+void comissaoVend(Vendedor *v, int *qtdV);
+
 
 int main(){
 	Vendedor *vet = NULL;
@@ -26,6 +29,8 @@ int main(){
 			vet = cadastrarVend(vet, &qtdV);	
 		}else if(n == 2){
 			mostrarVend(vet, &qtdV);
+		}else if(n == 3){
+			comissaoVend(vet, &qtdV);
 		}
 	}while(n != 0);
 	
@@ -34,12 +39,15 @@ int main(){
 
 Vendedor * cadastrarVend(Vendedor *v, int *qtdV){
 	
+	int vendN;
 	printf("Quantos vendedores deseja cadastrar? ");
-	scanf("%d", qtdV);
+	scanf("%d", &vendN);
 	
-	v = (Vendedor *)malloc(*qtdV*sizeof(Vendedor));
+	int qtdVN = *qtdV + vendN;
 	
-	for(int i = 0; i < *qtdV; i++){
+	v = (Vendedor *)realloc(v, qtdVN*sizeof(Vendedor));
+	
+	for(int i = *qtdV; i < qtdVN; i++){
 		printf("Diigite o nome: ");
 		scanf("%s", v[i].nome);
 		printf("Digite a idade: ");
@@ -49,6 +57,10 @@ Vendedor * cadastrarVend(Vendedor *v, int *qtdV){
 		printf("Digite o valor total de vendas: ");
 		scanf("%f", &v[i].totalVendido);
 	}
+	*qtdV = qtdVN;
+	
+	printf("\n\n");
+	
 	return v;
 }
 
@@ -58,5 +70,14 @@ void mostrarVend(Vendedor *v, int *qtdV){
 		printf("Idade: %d\n", v[i].idade);
 		printf("Salario Base: %.2f\n", v[i].salarioBase);
 		printf("Valor total de vendas: %.2f\n\n", v[i].totalVendido);
+	}
+}
+
+void comissaoVend(Vendedor *v, int *qtdV){
+	if(*qtdV > 0){
+		for(int i = 0; i < *qtdV; i++){
+			v[i].comissao = v[i].totalVendido * 0.03;
+			printf("Comissão para %s: %2.f\n", v[i].nome, v[i].comissao);
+		}
 	}
 }
