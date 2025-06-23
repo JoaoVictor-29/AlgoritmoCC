@@ -3,7 +3,7 @@
 
 float **alocar_matriz_real(int m, int n);
 void **liberar_matriz_real(int m, float **v);
-float **criarMatriz(float **vet);
+void **criarMatriz(float **vet);
 int main(){
 
     int m = 2, n = 2;
@@ -53,7 +53,7 @@ void **liberar_matriz_real(int m, float **v){
 }
 
 //QUESTÃO 3
-float **criarMatriz(float **vet){
+void **criarMatriz(float **vet){
 
     int m, n;
     printf("\n");
@@ -65,6 +65,17 @@ float **criarMatriz(float **vet){
     for(int i = 0; i < m; i++)
         vet[i] = (float *)malloc(n*sizeof(float));
 
+    for(int i = 0; i < m; i++){
+        printf("\n");
+        for(int j = 0; j < n; j++){
+            scanf("%f", &vet[i][j]);
+        }
+    }
 
-
+    for(int i = 0; i < m; i++){
+        printf("\n");
+        for(int j = 0; j < n; j++){
+            printf("%.1f ", vet[i][j]);
+        }
+    }
 }
