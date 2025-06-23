@@ -27,13 +27,14 @@ void **alocar_matriz_real(int m, int n){
 
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n; j++){
-            scanf("%f", &mat[m][n]);
+            scanf("%f", &mat[i][j]);
         }
     }
 
      for(int i = 0; i < m; i++){
+        printf("\n");
         for(int j = 0; j < n; j++){
-            printf("%f %f", mat[i][j]);
+            printf("%.2f ", mat[i][j]);
         }
     }
     /*return mat;*/
