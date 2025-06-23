@@ -1,22 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void **alocar_matriz_real(int m, int n);
+float **alocar_matriz_real(int m, int n);
 int main(){
 
     int m = 2, n = 2;
 
-    /*float **vet = */alocar_matriz_real(2, 2);
+    float **vet = alocar_matriz_real(2, 2);
 
-   /* for(int i = 0; i < m; i++){
+       for(int i = 0; i < m; i++){
+        printf("\n");
         for(int j = 0; j < n; j++){
-            printf("%.1f %.1f", vet[i][j]);
+            printf("%.1f ", vet[i][j]);
         }
     }
-*/
 }
 
-void **alocar_matriz_real(int m, int n){
+float **alocar_matriz_real(int m, int n){
 
     float **mat;
 
@@ -31,11 +31,5 @@ void **alocar_matriz_real(int m, int n){
         }
     }
 
-     for(int i = 0; i < m; i++){
-        printf("\n");
-        for(int j = 0; j < n; j++){
-            printf("%.2f ", mat[i][j]);
-        }
-    }
-    /*return mat;*/
+    return mat;
 }
