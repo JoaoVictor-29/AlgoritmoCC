@@ -16,10 +16,9 @@ int main()
 }
 
 int maiorNum(int *v, int j){
-    if(v[0] > v[1]){
+    if(j == 0)
         return v[0];
-    }else{
-        if(v[j] > v[j-1])
-            return maiorNum(v, j - 1);
-    }
+        
+    int maior = maiorNum(v, j - 1);
+    return (maior > v[j]) ? maior : v[j];
 }
