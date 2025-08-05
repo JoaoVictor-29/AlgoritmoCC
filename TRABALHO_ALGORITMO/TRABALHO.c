@@ -98,9 +98,7 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 		printf("Digite a data da compra: ");
 		fgets(vetComp[i].dataCompra, 8, stdin);
 		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
-		printf("Digite a data da compra: ");
-		fgets(vetComp[i].dataCompra, 8, stdin);
-		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
+
 	}
 	
 }
