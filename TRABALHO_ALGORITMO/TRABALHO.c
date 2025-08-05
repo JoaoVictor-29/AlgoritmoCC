@@ -54,21 +54,48 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 	int qtdNovo = *qtdC + clientes;
 	
 	vetC = (Clientes *)realloc(vetC, qtdNovo*sizeof(Clientes));
+	
 	for(int i = *qtdC; i < qtdNovo; i++){
-		printf("Digite o código do cliente: ");
-		scanf("%d", &vetC[i].codigo);
+		int codigoVal; //pra garantir que o codigo não vai se repetir
+		do{
+			codigoVal = 1;
+			printf("Digite o código do cliente: ");
+			scanf("%d", &vetC[i].codigo);
+			
+			for(int j = 0; j < i; j++){
+				if(vetC[j].codigo == vetC[i].codigo){
+					printf("Código já existente!\n");
+					codigoVal = 0;
+					break;
+				}
+			}
+				
+		}while(!codigoVal);
 		getchar();
 		printf("Digite o nome do cliente: ");
 		fgets(vetC[i].nome, 20, stdin);
 		vetC[i].nome[strcspn(vetC[i].nome, "\n")] = '\0';
-		printf("Digite o CPF do cliente: ");
-		fgets(vetC[i].CPF, 11, stdin);
-		vetC[i].CPF[strcspn(vetC[i].CPF, "\n")] = '\0';
+		
+		do{
+			codigoVal = 1;
+			printf("Digite o CPF do cliente: ");
+			fgets(vetC[i].CPF, 14, stdin);
+			vetC[i].CPF[strcspn(vetC[i].CPF, "\n")] = '\0';
+			
+			for(int j = 0; j < i; j++){
+				if(vetC[j].CPF == vetC[i].CPF){
+					printf("CPF já existente!\n");
+					codigoVal = 0;
+					break;
+				}
+			}
+		}while(!codigoVal);
+		
 		printf("Digite o telefone do cliente: ");
-	    fgets(vetC[i].telefone, 9, stdin);
+	        fgets(vetC[i].telefone, 12, stdin);
 		vetC[i].telefone[strcspn(vetC[i].telefone, "\n")] = '\0';
 		printf("Digite a data de nascimento do cliente: ");
-		fgets(vetC[i].dataNasc, 8, stdin);
+		fgets(vetC[i].dataNasc, 13, stdin);
 		vetC[i].dataNasc[strcspn(vetC[i].dataNasc, "\n")] = '\0';
 		printf("Digite o endereço do cliente: ");
 		fgets(vetC[i].endereco, 50, stdin);
