@@ -4,16 +4,16 @@
 
 typedef struct{
 	int codigo;
-	char nome[20];
-	char CPF[11];
-	char telefone[9];
-	char dataNasc[8];
+	char nome[50];
+	char CPF[12];
+	char telefone[12];
+	char dataNasc[9];
 	char endereco[50];
 	int ativo;
 }Clientes;
 
 typedef struct{
-	char dataCompra[8];
+	char dataCompra[9];
 	float valorTotal;
 	char formaPag[20];
 	char quitada;
@@ -100,5 +100,209 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
 
 	}
-	
+	*qtdComp = qtdNovoC;
+    return vetComp;
+}
+
+// Implementação da função de importação de dados (módulo 2)
+void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra, int *qtdCompras) {
+    FILE *arqBinClientes, *arqBinCompras;
+    FILE *arqTexto;
+    char linha[256];
+    char *token;
+
+    //abrir o arquivo Externo.txt
+    arqTexto = fopen("Externo.txt", "r");
+    if (arqTexto == NULL) {
+        printf("Erro ao abrir o arquivo Externo.txt\n");
+        return;
+    }
+
+    arqBinClientes = fopen("clientes.bin", "ab");
+    arqBinCompras = fopen("compras.bin", "ab");
+    if (arqBinClientes == NULL || arqBinCompras == NULL) {
+        printf("Erro ao abrir arquivos binários.\n");
+        fclose(arqTexto);
+        if (arqBinClientes) fclose(arqBinClientes);
+        if (arqBinCompras) fclose(arqBinCompras);
+        return;
+    }
+
+    *vetCliente = (Clientes *)realloc(*vetCliente, (*qtdClientes) * sizeof(Clientes));
+    *vetCompra = (Compras *)realloc(*vetCompra, (*qtdCompras) * sizeof(Compras));
+
+    while (fgets(linha, sizeof(linha), arqTexto) != NULL) {
+        if (strstr(linha, "Data:") != NULL) {
+            Compras novaCompra;
+            Clientes novoCliente;
+            
+            memset(&novaCompra, 0, sizeof(Compras));
+            memset(&novoCliente, 0, sizeof(Clientes));
+            novaCompra.ativo = 1;
+            novaCompra.quitada = 'n';
+            novoCliente.ativo = 1;
+            strcpy(novoCliente.CPF, "Nao Informado");
+            strcpy(novoCliente.dataNasc, "Nao Informado");
+            strcpy(novoCliente.endereco, "Nao Informado");
+
+            token = strtok(linha, ":");
+            token = strtok(NULL, "\n");
+            strcpy(novaCompra.dataCompra, token + 1);
+
+            fgets(linha, sizeof(linha), arqTexto);
+            token = strtok(linha, ":");
+            token = strtok(NULL, "\n");
+            novaCompra.valorTotal = atof(token + 1);
+            
+            fgets(linha, sizeof(linha), arqTexto);
+            token = strtok(linha, ":");
+            token = strtok(NULL, "\n");
+            strcpy(novaCompra.formaPag, token + 1);
+            
+            fgets(linha, sizeof(linha), arqTexto);
+            token = strtok(linha, ":");
+            token = strtok(NULL, "\n");
+            novaCompra.codigoCliente = atoi(token + 1);
+            novoCliente.codigo = novaCompra.codigoCliente;
+
+            (*qtdCompras)++;
+            *vetCompra = (Compras *)realloc(*vetCompra, (*qtdCompras) * sizeof(Compras));
+            if (*vetCompra == NULL) {
+                printf("Erro ao realocar memória para compras.\n");
+                exit(1);
+            }
+            (*vetCompra)[*qtdCompras - 1] = novaCompra;
+
+            fwrite(&novaCompra, sizeof(Compras), 1, arqBinCompras);
+
+            if (!verificaClienteExistente(*vetCliente, *qtdClientes, novoCliente.codigo)) {
+                while (fgets(linha, sizeof(linha), arqTexto) != NULL && strlen(linha) > 1 && strstr(linha, "Data:") == NULL) {
+                    if (strstr(linha, "Nome:") != NULL) {
+                        token = strtok(linha, ":");
+                        token = strtok(NULL, "\n");
+                        strcpy(novoCliente.nome, token + 1);
+                    } else if (strstr(linha, "Rua:") != NULL) {
+                        token = strtok(linha, ":");
+                        token = strtok(NULL, "\n");
+                        strcat(novoCliente.endereco, "Rua: ");
+                        strcat(novoCliente.endereco, token + 1);
+                    } else if (strstr(linha, "Número:") != NULL) {
+                        token = strtok(linha, ":");
+                        token = strtok(NULL, "\n");
+                        strcat(novoCliente.endereco, ", Número: ");
+                        strcat(novoCliente.endereco, token + 1);
+                    } else if (strstr(linha, "Bairro:") != NULL) {
+                        token = strtok(linha, ":");
+                        token = strtok(NULL, "\n");
+                        strcat(novoCliente.endereco, ", Bairro: ");
+                        strcat(novoCliente.endereco, token + 1);
+                    } else if (strstr(linha, "Telefone:") != NULL) {
+                        token = strtok(linha, ":");
+                        token = strtok(NULL, "\n");
+                        strcpy(novoCliente.telefone, token + 1);
+                    }
+                }
+                
+                (*qtdClientes)++;
+                *vetCliente = (Clientes *)realloc(*vetCliente, (*qtdClientes) * sizeof(Clientes));
+                if (*vetCliente == NULL) {
+                    printf("Erro ao realocar memória para clientes.\n");
+                    exit(1);
+                }
+                (*vetCliente)[*qtdClientes - 1] = novoCliente;
+
+                fwrite(&novoCliente, sizeof(Clientes), 1, arqBinClientes);
+            }
+            if (strstr(linha, "Data:") != NULL) {
+                fseek(arqTexto, -strlen(linha), SEEK_CUR);
+            }
+        }
+    }
+    
+    printf("Importação de dados do Externo.txt concluída com sucesso.\n");
+    fclose(arqTexto);
+    fclose(arqBinClientes);
+    fclose(arqBinCompras);
+}
+//verificar se o cliente existe
+int verificaClienteExistente(Clientes *vetCliente, int qtdClientes, int codigo) {
+    for (int i = 0; i < qtdClientes; i++) {
+        if (vetCliente[i].codigo == codigo) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// Funções para exibir dados (teste)
+void exibirClientes(Clientes *vetC, int qtdC) {
+    printf("\n--- LISTA DE CLIENTES ---\n");
+    if (qtdC == 0) {
+        printf("Nenhum cliente cadastrado.\n");
+        return;
+    }
+    for (int i = 0; i < qtdC; i++) {
+        printf("Código: %d, Nome: %s, Ativo: %d\n", vetC[i].codigo, vetC[i].nome, vetC[i].ativo);
+    }
+}
+
+void exibirCompras(Compras *vetComp, int qtdComp) {
+    printf("\n--- LISTA DE COMPRAS ---\n");
+    if (qtdComp == 0) {
+        printf("Nenhuma compra cadastrada.\n");
+        return;
+    }
+    for (int i = 0; i < qtdComp; i++) {
+        printf("Código do Cliente: %d, Valor: %.2f, Data: %s, Ativo: %d\n", vetComp[i].codigoCliente, vetComp[i].valorTotal, vetComp[i].dataCompra, vetComp[i].ativo);
+    }
+}
+
+// Funções para salvar e carregar dados em arquivos binários
+void salvarDados(Clientes *vetC, int qtdC, Compras *vetComp, int qtdComp) {
+    FILE *arqClientes = fopen("clientes.bin", "wb");
+    FILE *arqCompras = fopen("compras.bin", "wb");
+
+    if (arqClientes != NULL) {
+        fwrite(vetC, sizeof(Clientes), qtdC, arqClientes);
+        fclose(arqClientes);
+    }
+    if (arqCompras != NULL) {
+        fwrite(vetComp, sizeof(Compras), qtdComp, arqCompras);
+        fclose(arqCompras);
+    }
+}
+//carregar dados
+void carregarDados(Clientes **vetC, int *qtdC, Compras **vetComp, int *qtdComp) {
+    FILE *arqClientes = fopen("clientes.bin", "rb");
+    FILE *arqCompras = fopen("compras.bin", "rb");
+
+    if (arqClientes != NULL) {
+        fseek(arqClientes, 0, SEEK_END);
+        long tamanho = ftell(arqClientes);
+        rewind(arqClientes);
+
+        *qtdC = tamanho / sizeof(Clientes);
+        *vetC = (Clientes *)realloc(*vetC, (*qtdC) * sizeof(Clientes));
+        if (*vetC == NULL) {
+            printf("Erro ao carregar dados de clientes.\n");
+            exit(1);
+        }
+        fread(*vetC, sizeof(Clientes), *qtdC, arqClientes);
+        fclose(arqClientes);
+    }
+    
+    if (arqCompras != NULL) {
+        fseek(arqCompras, 0, SEEK_END);
+        long tamanho = ftell(arqCompras);
+        rewind(arqCompras);
+
+        *qtdComp = tamanho / sizeof(Compras);
+        *vetComp = (Compras *)realloc(*vetComp, (*qtdComp) * sizeof(Compras));
+        if (*vetComp == NULL) {
+            printf("Erro ao carregar dados de compras.\n");
+            exit(1);
+        }
+        fread(*vetComp, sizeof(Compras), *qtdComp, arqCompras);
+        fclose(arqCompras);
+    }
 }
