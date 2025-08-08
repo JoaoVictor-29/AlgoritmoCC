@@ -15,7 +15,7 @@ typedef struct{
 typedef struct{
 	char dataCompra[9];
 	float valorTotal;
-	char formaPag[20];
+	char formaPag[30];
 	char quitada;
 	int codigoCliente;
 	int ativo;
@@ -23,14 +23,15 @@ typedef struct{
 
 
 Clientes * cadastrarClientes(Clientes *vetC, int *qtdC);
+Compras * cadastrarCompras(Compras *vetComp, int *qtdComp);
 
 int main(){
 	Clientes *vetCliente = NULL;
 	Compras *vetCompra = NULL;
-	
+
 	printf("O QUE DESEJA FAZER? \n\n");
 	int n, qtdClientes = 0, qtdCompras = 0;
-	
+
 	do{
 		printf("CADASTRAR CLIENTE (1)\n");
 		printf("CADASTRAR COMPRAS (2)\n");
@@ -42,26 +43,29 @@ int main(){
 		scanf("%d", &n);
 		if(n == 1)
 			vetCliente = cadastrarClientes(vetCliente, &qtdClientes);
+        if(n == 2)
+            vetCompra = cadastrarCompras(vetCliente, &qtdCompras);
+
 	}while(n != 0);
 }
 
 Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
-	
+
 	int clientes;
 	printf("Quantos clientes deseja cadastrar? ");
 	scanf("%d", &clientes);
-	
+
 	int qtdNovo = *qtdC + clientes;
-	
+
 	vetC = (Clientes *)realloc(vetC, qtdNovo*sizeof(Clientes));
-	
+
 	for(int i = *qtdC; i < qtdNovo; i++){
 		int codigoVal; //pra garantir que o codigo não vai se repetir
 		do{
 			codigoVal = 1;
 			printf("Digite o código do cliente: ");
 			scanf("%d", &vetC[i].codigo);
-			
+
 			for(int j = 0; j < i; j++){
 				if(vetC[j].codigo == vetC[i].codigo){
 					printf("Código já existente!\n");
@@ -69,19 +73,19 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 					break;
 				}
 			}
-				
+
 		}while(!codigoVal);
 		getchar();
 		printf("Digite o nome do cliente: ");
 		fgets(vetC[i].nome, 20, stdin);
 		vetC[i].nome[strcspn(vetC[i].nome, "\n")] = '\0';
-		
+
 		do{
 			codigoVal = 1;
 			printf("Digite o CPF do cliente: ");
 			fgets(vetC[i].CPF, 14, stdin);
 			vetC[i].CPF[strcspn(vetC[i].CPF, "\n")] = '\0';
-			
+
 			for(int j = 0; j < i; j++){
 				if(vetC[j].CPF == vetC[i].CPF){
 					printf("CPF já existente!\n");
@@ -90,7 +94,7 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 				}
 			}
 		}while(!codigoVal);
-		
+
 		printf("Digite o telefone do cliente: ");
 	        fgets(vetC[i].telefone, 12, stdin);
 		vetC[i].telefone[strcspn(vetC[i].telefone, "\n")] = '\0';
@@ -100,24 +104,24 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 		printf("Digite o endereço do cliente: ");
 		fgets(vetC[i].endereco, 50, stdin);
 		vetC[i].endereco[strcspn(vetC[i].endereco, "\n")] = '\0';
-		
+
 		vetC[i].ativo = 1;
 	}
 	*qtdC = qtdNovo;
 	printf("\n\n");
-	
+
 	return vetC;
 }
 
 Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
-	
+
 	int compras;
 	printf("Quantas compras deseja cadastrar? ");
 	scanf("%d", &compras);
-	
+
 	int qtdNovoC = *qtdComp + compras;
-	
-	vetComp = (Compras *)realloc(vetC, qtdNovoC*sizeof(Compras));
+
+	vetComp = (Compras *)realloc(vetComp, qtdNovoC*sizeof(Compras));
 	for(int i = *qtdComp; i < qtdNovoC; i++){
 		printf("Digite o codigo da compra do cliente: ");
 		scanf("%d", &vetComp[i].codigoCliente);
@@ -125,7 +129,9 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 		printf("Digite a data da compra: ");
 		fgets(vetComp[i].dataCompra, 8, stdin);
 		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
-
+        printf("Digite a forma de pagamento: (Cartao de credito, Pix, Dinheiro, Boleto) ");
+        fgets(vetComp[i].formaPag, 30, stdin);
+        vetComp[i].formaPag[strcspn(vetComp[i].formaPag, "\n")] = '\0';
 	}
 	*qtdComp = qtdNovoC;
     return vetComp;
@@ -162,7 +168,7 @@ void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra,
         if (strstr(linha, "Data:") != NULL) {
             Compras novaCompra;
             Clientes novoCliente;
-            
+
             memset(&novaCompra, 0, sizeof(Compras));
             memset(&novoCliente, 0, sizeof(Clientes));
             novaCompra.ativo = 1;
@@ -180,12 +186,12 @@ void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra,
             token = strtok(linha, ":");
             token = strtok(NULL, "\n");
             novaCompra.valorTotal = atof(token + 1);
-            
+
             fgets(linha, sizeof(linha), arqTexto);
             token = strtok(linha, ":");
             token = strtok(NULL, "\n");
             strcpy(novaCompra.formaPag, token + 1);
-            
+
             fgets(linha, sizeof(linha), arqTexto);
             token = strtok(linha, ":");
             token = strtok(NULL, "\n");
@@ -229,7 +235,7 @@ void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra,
                         strcpy(novoCliente.telefone, token + 1);
                     }
                 }
-                
+
                 (*qtdClientes)++;
                 *vetCliente = (Clientes *)realloc(*vetCliente, (*qtdClientes) * sizeof(Clientes));
                 if (*vetCliente == NULL) {
@@ -245,7 +251,7 @@ void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra,
             }
         }
     }
-    
+
     printf("Importação de dados do Externo.txt concluída com sucesso.\n");
     fclose(arqTexto);
     fclose(arqBinClientes);
@@ -317,7 +323,7 @@ void carregarDados(Clientes **vetC, int *qtdC, Compras **vetComp, int *qtdComp) 
         fread(*vetC, sizeof(Clientes), *qtdC, arqClientes);
         fclose(arqClientes);
     }
-    
+
     if (arqCompras != NULL) {
         fseek(arqCompras, 0, SEEK_END);
         long tamanho = ftell(arqCompras);
