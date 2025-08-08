@@ -114,27 +114,35 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 }
 
 Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
-
+	
 	int compras;
 	printf("Quantas compras deseja cadastrar? ");
 	scanf("%d", &compras);
-
+	
 	int qtdNovoC = *qtdComp + compras;
-
+	
 	vetComp = (Compras *)realloc(vetComp, qtdNovoC*sizeof(Compras));
 	for(int i = *qtdComp; i < qtdNovoC; i++){
 		printf("Digite o codigo da compra do cliente: ");
 		scanf("%d", &vetComp[i].codigoCliente);
 		getchar();
 		printf("Digite a data da compra: ");
-		fgets(vetComp[i].dataCompra, 8, stdin);
+		fgets(vetComp[i].dataCompra, 13, stdin);
 		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
-        printf("Digite a forma de pagamento: (Cartao de credito, Pix, Dinheiro, Boleto) ");
-        fgets(vetComp[i].formaPag, 30, stdin);
-        vetComp[i].formaPag[strcspn(vetComp[i].formaPag, "\n")] = '\0';
+		printf("Digite a forma de pagamento: (Cartao de credito, PIX, Dinheiro, Boleto) ");
+		fgets(vetComp[i].formaPag, 25, stdin);
+		vetComp[i].formaPag[strcspn(vetComp[i].formaPag, "\n")] = '\0';
+		printf("A compra está quitada? ");
+		scanf("%d", &vetComp[i].quitada);
+		printf("Digite o valor total: ");
+		scanf("%f", &vetComp[i].valorTotal);
+		
+		vetComp[i].ativo = 1;
 	}
 	*qtdComp = qtdNovoC;
-    return vetComp;
+	printf("\n\n");
+	
+	return vetComp;
 }
 
 // Implementação da função de importação de dados (módulo 2)
