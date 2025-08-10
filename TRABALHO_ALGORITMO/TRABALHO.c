@@ -23,6 +23,7 @@ typedef struct{
 
 
 Clientes * cadastrarClientes(Clientes *vetComp, int *qtdC);
+void statusCliente(Clientes *vetC, int qtdC);
 void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
 void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
 
@@ -176,6 +177,47 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 	printf("\n\n");
 	
 	return vetComp;
+}
+
+void statusCliente(Clientes *vetC, int qtdC){ //Função pra desativar cliente
+	if(qtdC == 0)
+		printf("Nenhum cliente cadastrado!\n\n");
+		
+	int codBusca;
+	printf("Digite o codigo do cliente que deseja buscar: \n");
+	scanf("%d", &codBusca);
+	
+	int encontrado = 0;
+	for(int i = 0; i < qtdC; i++){
+		if(vetC[i].codigo == codBusca){
+			encontrado = 1;
+			
+			printf("Cliente encontrado: %s \n", vetC[i].nome);
+			printf("Status do cliente: %s\n", vetC[i].ativo == 1? "Ativo" : "Inativo");
+			
+			int opcaoAtivo;
+			printf("-----O QUE DESEJA FAZER: -----	\n\n");
+			printf("ATIVAR CLIENTE (1)\n");
+			printf("DESATIVAR CLIENTE (2)\n");
+			printf("CANCELAR (3)\n");
+			scanf("%d", &opcaoAtivo);
+			
+			if(opcaoAtivo == 1){
+				vetC[i].ativo = 0;
+				printf("Cliente ativado!\n\n");
+			}
+			if(opcaoAtivo == 2){
+				vetC[i].ativo = 0;
+				printf("Cliente desativado!\n\n");
+			}
+			if(opcaoAtivo == 3)
+				printf("Operação cancelada!\n");
+				
+			break;
+		}
+	}
+	if(!encontrado)
+		printf("Cliente não encontrado!");
 }
 
 // Implementação da função de importação de dados (módulo 2)
