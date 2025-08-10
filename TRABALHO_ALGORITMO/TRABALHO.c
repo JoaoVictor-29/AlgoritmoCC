@@ -23,7 +23,8 @@ typedef struct{
 
 
 Clientes * cadastrarClientes(Clientes *vetComp, int *qtdC);
-void salvar_arquivoBin(Clientes *vet_Cliente,int quant_Cliente);
+void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
+void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
 
 int main(){
 	Clientes *vetCliente = NULL;
@@ -50,7 +51,8 @@ int main(){
            vetCliente = cadastrarClientes(vetCliente, &qtdClientes);
             break;
         case 2:
-          void salvar_arquivoBin(Clientes *vet_Cliente,int quant_Cliente);
+          void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
+          void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
            break;
         default:
             break;
@@ -118,8 +120,8 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 	
 	return vetC;
 }
-
-void salvar_arquivoBin(Clientes *vet_Cliente,int quant_Cliente){
+//funções de salvar no arquivo binario (Da pra jogarem num sub menu dos cadastros pra n ficar mt cheio o menu principal)
+void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente){
     FILE *pont_arqBin;
     pont_arqBin = fopen("cliente.txt","wb");
       if(pont_arqBin){
@@ -131,30 +133,50 @@ void salvar_arquivoBin(Clientes *vet_Cliente,int quant_Cliente){
         printf("ERROOOO- MELHOR CONSERTAR");
       }
 }
+void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra){
+    FILE *pont_arqBin;
+    pont_arqBin = fopen("compra.txt","wb");
+      if(pont_arqBin){
+          fprintf(pont_arqBin,"%d\n",quant_Compra);
+          fwrite(vet_Compra,sizeof(Clientes),quant_Compra,pont_arqBin);
+          fclose(pont_arqBin);
+      }
+      else{
+        printf("ERROOOO- MELHOR CONSERTAR");
+      }
+}
 
-/*
 Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 	
 	int compras;
 	printf("Quantas compras deseja cadastrar? ");
 	scanf("%d", &compras);
-    //pont_compras = fopen("compra.bin","r+");
 	
 	int qtdNovoC = *qtdComp + compras;
 	
-	vetComp = (Compras *)realloc(vetComp, qtdNovoC*sizeof(Compras));//olhar dps
+	vetComp = (Compras *)realloc(vetComp, qtdNovoC*sizeof(Compras));
 	for(int i = *qtdComp; i < qtdNovoC; i++){
 		printf("Digite o codigo da compra do cliente: ");
 		scanf("%d", &vetComp[i].codigoCliente);
 		getchar();
 		printf("Digite a data da compra: ");
-		fgets(vetComp[i].dataCompra, 8, stdin);
+		fgets(vetComp[i].dataCompra, 13, stdin);
 		vetComp[i].dataCompra[strcspn(vetComp[i].dataCompra, "\n")] = '\0';
-
+		printf("Digite a forma de pagamento: (Cartao de credito, PIX, Dinheiro, Boleto) ");
+		fgets(vetComp[i].formaPag, 25, stdin);
+		vetComp[i].formaPag[strcspn(vetComp[i].formaPag, "\n")] = '\0';
+		printf("A compra está quitada? ");
+		scanf("%d", &vetComp[i].quitada);
+		printf("Digite o valor total: ");
+		scanf("%f", &vetComp[i].valorTotal);
+		
+		vetComp[i].ativo = 1;
 	}
 	*qtdComp = qtdNovoC;
-    return vetComp;
-}*/
+	printf("\n\n");
+	
+	return vetComp;
+}
 
 // Implementação da função de importação de dados (módulo 2)
 /*void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra, int *qtdCompras) {
