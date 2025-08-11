@@ -23,9 +23,11 @@ typedef struct{
 
 
 Clientes * cadastrarClientes(Clientes *vetComp, int *qtdC);
-void statusCliente(Clientes *vetC, int qtdC);
 void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
+Compras * cadastrarCompras(Compras *vetComp, int *qtdComp)
 void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
+void statusCliente(Clientes *vetC, int qtdC);
+void statusCompras(Compras *vetComp, int qtdComp);
 
 int main(){
 	Clientes *vetCliente = NULL;
@@ -43,7 +45,8 @@ int main(){
 		printf("EXIBIR TODOS OS REGISTROS (4)\n");
 		printf("ATUALIZAR DADOS DE CLIENTES (5)\n");
 		printf("ATUALIZAR DADOS DE COMPRAS (6)\n");
-		printf("ATIVAR OU DESATIVAR UM REGISTRO (7)\n");
+		printf("ATIVAR OU DESATIVAR UM REGISTRO DE CLIENTE (7)\n");
+		printf("ATIVAR OU DESATIVAR UM REGISTRO DE COMPRA (8)\n");
 		printf("DIGITE 0 PARA FINALIZAR\n");
 		scanf("%d", &n);
 		switch (n)
@@ -55,6 +58,7 @@ int main(){
           void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
           void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
            break;
+		
         default:
             break;
         } 
@@ -88,35 +92,37 @@ Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 		}while(!codigoVal);
 		getchar();
 		printf("Digite o nome do cliente: ");
-		 fgets(vetC[i].nome, 20, stdin);
+		fgets(vetC[i].nome, 20, stdin);
 		vetC[i].nome[strcspn(vetC[i].nome, "\n")] = '\0';
-
+		
+		do{
+			codigoVal = 1;
 			printf("Digite o CPF do cliente: ");
-			fgets(vetC[i].CPF, 12, stdin);
+			fgets(vetC[i].CPF, 14, stdin);
 			vetC[i].CPF[strcspn(vetC[i].CPF, "\n")] = '\0';
-
+			
 			for(int j = 0; j < i; j++){
-				if(vetC[j].CPF == vetC[i].CPF){
+				if(strcmp(vetC[j].CPF, vetC[i].CPF) == 0){
 					printf("CPF já existente!\n");
 					codigoVal = 0;
 					break;
 				}
 			}
-		
+		}while(!codigoVal);
 		
 		printf("Digite o telefone do cliente: ");
-	      fgets(vetC[i].telefone, 12, stdin);
+	    fgets(vetC[i].telefone, 12, stdin);
 		vetC[i].telefone[strcspn(vetC[i].telefone, "\n")] = '\0';
 		printf("Digite a data de nascimento do cliente: ");
-		  fgets(vetC[i].dataNasc, 9, stdin);
-		   vetC[i].dataNasc[strcspn(vetC[i].dataNasc, "\n")] = '\0';
+		fgets(vetC[i].dataNasc, 13, stdin);
+		vetC[i].dataNasc[strcspn(vetC[i].dataNasc, "\n")] = '\0';
 		printf("Digite o endereço do cliente: ");
-		   fgets(vetC[i].endereco, 50, stdin);
-		    vetC[i].endereco[strcspn(vetC[i].endereco, "\n")] = '\0';
+		fgets(vetC[i].endereco, 50, stdin);
+		vetC[i].endereco[strcspn(vetC[i].endereco, "\n")] = '\0';
 		
 		vetC[i].ativo = 1;
 	}
-	 *qtdC = qtdNovo;
+	*qtdC = qtdNovo;
 	printf("\n\n");
 	
 	return vetC;
@@ -203,7 +209,7 @@ void statusCliente(Clientes *vetC, int qtdC){ //Função pra desativar cliente
 			scanf("%d", &opcaoAtivo);
 			
 			if(opcaoAtivo == 1){
-				vetC[i].ativo = 0;
+				vetC[i].ativo = 1;
 				printf("Cliente ativado!\n\n");
 			}
 			if(opcaoAtivo == 2){
@@ -219,6 +225,50 @@ void statusCliente(Clientes *vetC, int qtdC){ //Função pra desativar cliente
 	if(!encontrado)
 		printf("Cliente não encontrado!");
 }
+
+void statusCompras(Compras *vetComp, int qtdComp){
+	if(qtdComp == 0){
+		printf("Nenhum cliente cadastrado!\n\n");
+		return;
+	}
+		
+	int codBusca;
+	printf("Digite o codigo da compra que deseja buscar: \n");
+	scanf("%d", &codBusca);
+	
+	int encontrado = 0;
+	for(int i = 0; i < qtdComp; i++){
+		if(vetComp[i].codigoCliente == codBusca){
+			encontrado = 1;
+			
+			printf("Compra encontrada\n\n!");
+			printf("Status da compra: %s\n\n", vetComp[i].ativo == 1? "Ativo" : "Inativo");
+			
+			int opcaoAtivo;
+			printf("-----O QUE DESEJA FAZER: -----	\n\n");
+			printf("ATIVAR COMPRA (1)\n");
+			printf("DESATIVAR COMPRA (2)\n");
+			printf("CANCELAR (3)\n");
+			scanf("%d", &opcaoAtivo);
+			
+			if(opcaoAtivo == 1){
+				vetComp[i].ativo = 1;
+				printf("Compra ativada!\n\n");
+			}
+			if(opcaoAtivo == 2){
+				vetComp[i].ativo = 0;
+				printf("Compra desativada!\n\n");
+			}
+			if(opcaoAtivo == 3)
+				printf("Operação cancelada!\n");
+				
+			break;
+		}
+	}
+	if(!encontrado)
+		printf("Compra não encontrada!");
+}
+
 
 // Implementação da função de importação de dados (módulo 2)
 /*void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra, int *qtdCompras) {
