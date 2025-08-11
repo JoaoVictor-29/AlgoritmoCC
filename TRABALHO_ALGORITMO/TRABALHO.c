@@ -42,11 +42,12 @@ int main(){
 		printf("CADASTRAR CLIENTE (1)\n");
         printf("SALVAR ARQUIVO BINARIO (2)\n");
 		printf("CADASTRAR COMPRAS (3)\n");
-		printf("EXIBIR TODOS OS REGISTROS (4)\n");
-		printf("ATUALIZAR DADOS DE CLIENTES (5)\n");
-		printf("ATUALIZAR DADOS DE COMPRAS (6)\n");
-		printf("ATIVAR OU DESATIVAR UM REGISTRO DE CLIENTE (7)\n");
-		printf("ATIVAR OU DESATIVAR UM REGISTRO DE COMPRA (8)\n");
+		printf("EXIBIR REGISTROS DE CLIENTES (4)\n");
+		printf("EXIBIR REGISTROS DE COMPRAS (5)\n");
+		printf("ATUALIZAR DADOS DE CLIENTES (6)\n");
+		printf("ATUALIZAR DADOS DE COMPRAS (7)\n");
+		printf("ATIVAR OU DESATIVAR UM REGISTRO DE CLIENTE (8)\n");
+		printf("ATIVAR OU DESATIVAR UM REGISTRO DE COMPRA (9)\n");
 		printf("DIGITE 0 PARA FINALIZAR\n");
 		scanf("%d", &n);
 		switch (n)
@@ -58,11 +59,22 @@ int main(){
           void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
           void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
            break;
-		
+		case 3 :
+			vetCompra = cadastrarCompras(vetCompra, &qtdCompras);
+			break;
+		case 4:
+			exibirRegistrosClientes(vetCliente, qtdClientes);
+			break;
+		case 5:
+			exibirRegistrosCompras(Vetcompra, qtdCompras);
+			break;
         default:
             break;
         } 
 	}while(n != 0);
+
+	free(vetCliente);
+	free(vetCompra);
 }
 Clientes * cadastrarClientes(Clientes *vetC, int *qtdC){
 	
