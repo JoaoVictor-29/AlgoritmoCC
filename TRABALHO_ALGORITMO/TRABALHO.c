@@ -5,17 +5,17 @@
 typedef struct{
 	int codigo;
 	char nome[50];
-	char CPF[12];
+	char CPF[14];
 	char telefone[12];
-	char dataNasc[9];
+	char dataNasc[13];
 	char endereco[50];
 	int ativo;
 }Clientes;
 
 typedef struct{
-	char dataCompra[9];
+	char dataCompra[13];
 	float valorTotal;
-	char formaPag[20];
+	char formaPag[25];
 	char quitada;
 	int codigoCliente;
 	int ativo;
@@ -24,8 +24,10 @@ typedef struct{
 
 Clientes * cadastrarClientes(Clientes *vetComp, int *qtdC);
 void salvar_arquivoBin_cliente(Clientes *vet_Cliente,int quant_Cliente);
-Compras * cadastrarCompras(Compras *vetComp, int *qtdComp)
+Compras * cadastrarCompras(Compras *vetComp, int *qtdComp);
 void salvar_arquivoBin_compra(Clientes *vet_Compra,int quant_Compra);
+void exibirRegistrosCliente(Clientes *vetC, int qtdC);
+void exibirRegistrosCompras(Compras *vetComp, int qtdComp);
 void statusCliente(Clientes *vetC, int qtdC);
 void statusCompras(Compras *vetComp, int qtdComp);
 
@@ -63,11 +65,20 @@ int main(){
 			vetCompra = cadastrarCompras(vetCompra, &qtdCompras);
 			break;
 		case 4:
-			exibirRegistrosClientes(vetCliente, qtdClientes);
+			exibirRegistrosCliente(vetCliente, qtdClientes);
 			break;
 		case 5:
-			exibirRegistrosCompras(Vetcompra, qtdCompras);
+			exibirRegistrosCompras(vetCompra, qtdCompras);
 			break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            statusCliente(vetCliente, qtdClientes);
+            break;
+        case 9:
+            statusCompras(vetCompra, qtdCompras);
         default:
             break;
         } 
@@ -185,7 +196,7 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 		fgets(vetComp[i].formaPag, 25, stdin);
 		vetComp[i].formaPag[strcspn(vetComp[i].formaPag, "\n")] = '\0';
 		printf("A compra está quitada? ");
-		scanf("%d", &vetComp[i].quitada);
+		scanf("%s", &vetComp[i].quitada);
 		printf("Digite o valor total: ");
 		scanf("%f", &vetComp[i].valorTotal);
 		
@@ -196,6 +207,49 @@ Compras * cadastrarCompras(Compras *vetComp, int *qtdComp){
 	
 	return vetComp;
 }
+
+void exibirRegistrosCliente(Clientes *vetC, int qtdC){
+	
+	if(qtdC == 0){
+		printf("Nenhum registro de cliente!\n\n");
+		return;
+	}
+	
+	printf("---REGISTROS DE CLIENTES ATIVOS---\n\n");
+	
+	for(int i = 0; i < qtdC; i++){
+		if(vetC[i].ativo == 1){
+			printf("Codigo do cliente: %d\n", vetC[i].codigo);
+			printf("Nome: %s\n", vetC[i].nome);
+			printf("CPF: %s\n", vetC[i].CPF);
+			printf("Telefone: %s\n", vetC[i].telefone);
+			printf("Data de Nascimento: %s\n", vetC[i].dataNasc);
+			printf("Endereço: %s\n\n", vetC[i].endereco);
+		}
+	}
+	
+}
+
+void exibirRegistrosCompras(Compras *vetComp, int qtdComp){
+	
+	if(qtdComp == 0){
+		printf("Nenhum registro de compra!\n\n");
+		return;
+	}
+	
+	printf("---REGISTROS DE COMPRAS ATIVAS---\n\n");
+	
+	for(int i = 0; i < qtdComp; i++){
+		if(vetComp[i].ativo == 1){
+			printf("Codigo da compra: %d\n", vetComp[i].codigoCliente);
+			printf("Data da Compra: %s\n", vetComp[i].dataCompra);
+			printf("Forma de pagamento: %s\n", vetComp[i].formaPag);
+			printf("Valor: %2.f\n", vetComp[i].valorTotal);
+
+		}
+	}
+}
+
 
 void statusCliente(Clientes *vetC, int qtdC){ //Função pra desativar cliente
 	if(qtdC == 0)
@@ -280,7 +334,6 @@ void statusCompras(Compras *vetComp, int qtdComp){
 	if(!encontrado)
 		printf("Compra não encontrada!");
 }
-
 
 // Implementação da função de importação de dados (módulo 2)
 /*void importarDados(Clientes **vetCliente, int *qtdClientes, Compras **vetCompra, int *qtdCompras) {
