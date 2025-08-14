@@ -3,6 +3,7 @@
 #include <string.h>
 #include <locale.h>
 
+//Estrutura de Clientes
 typedef struct{
     int codigo;
     char nome[50];
@@ -13,6 +14,7 @@ typedef struct{
     int ativo;
 } Cliente;
 
+//Estrutura de Compras
 typedef struct{
     char dataCompra[13];
     float valorTotal;
@@ -222,7 +224,7 @@ int verificarCodigoCliente(int *codigoDigitado) {
     }
     fclose(fc);
     if(encontrou == 1)
-        return clienteCod.codigo;
+        return controle;
     else
         return -1;
 }
@@ -246,7 +248,7 @@ int verificarCPFCliente(char *cpfDigitado) {
     }
     fclose(fc);
     if(encontrou == 1)
-        return clienteCpf.codigo;
+        return controle;
     else
         return -1;
 }
