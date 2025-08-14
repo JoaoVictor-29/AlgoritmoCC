@@ -43,6 +43,7 @@ void inserirCompra();
 void listarDadosCompras();
 void alterarDadosCompra();
 void exclusaoLogicaCompra();
+void busca_compra_especifica();
 
 int main(void) {
     setlocale(LC_ALL, "Portuguese");
@@ -128,7 +129,8 @@ void menuCompras(){
         printf("2 - Listar\n");
         printf("3 - Alterar dados da compra\n");
         printf("4 - Ativar / Desativar Cliente\n");
-        printf("5 - Sair\n");
+        printf("5- Buscar compra especifica:\n");
+        printf("6 - Sair\n");
         printf("\nOpcao Escolhida: ");
         scanf("%d", &opc);
 
@@ -145,12 +147,15 @@ void menuCompras(){
             exclusaoLogicaCompra();
         }
         else if(opc == 5){
+            busca_compra_especifica();
+        }
+        else if(opc == 6){
             printf("\nRetornando para o menu principal...\n\n");
         }
         else{
             printf("Opcao inválida!\n\n");
         }
-    }while(opc != 5);
+    }while(opc != 6);
 }
 
 void inserirCliente() {
@@ -176,7 +181,7 @@ void inserirCliente() {
     strcpy(novoCliente.CPF, cpfNovo);
     printf("Código: ");
     scanf("\n%d", &codigoNovo);
-    
+
     if(verificarCodigoCliente(&codigoNovo) != - 1){
 		printf("Código já está cadastrado no sistema!\n");
 		return;
@@ -349,19 +354,19 @@ void exclusaoLogicaCliente(){
 	long int pos;
 	Cliente clienteNovo;
 	FILE *ptArq;
-	
+
 	printf("\n------------------------------------------\n");
     printf("        ATIVAR / DESATIVAR CLIENTE         \n");
     printf("------------------------------------------\n");
     printf("Digite o codigo do cliente: ");
     scanf("%d", &codNovo);
-    
+
     ptArq = fopen("Clientes.bin", "r+b");
     if(ptArq == NULL){
 		printf("Nenhum cliente cadastrado!\n");
 		return;
 	}
-		
+
 	while (fread(&clienteNovo, sizeof(Cliente), 1, ptArq)){
         if(clienteNovo.codigo == codNovo){
             encontrou = 1;
@@ -377,9 +382,9 @@ void exclusaoLogicaCliente(){
         printf("2 - Desativar cliente\n");
         printf("\nOpcao escolhida: ");
         scanf("%d", &opc);
-		
+
 		fseek(ptArq, pos, SEEK_SET);
-		
+
         if (opc == 1) {
 			if(clienteNovo.ativo == 1){
 				printf("Cliente já está ativo!\n");
@@ -536,19 +541,19 @@ void exclusaoLogicaCompra(){
 	long int pos;
 	Compra compraNovo;
 	FILE *ptArq;
-	
+
 	printf("\n------------------------------------------\n");
     printf("        ATIVAR / DESATIVAR COMPRA         \n");
     printf("------------------------------------------\n");
     printf("Digite o codigo do cliente da compra: ");
     scanf("%d", &codNovo);
-    
+
     ptArq = fopen("Compras.bin", "r+b");
     if(ptArq == NULL){
 		printf("Nenhuma compra cadastrado!\n");
 		return;
 	}
-		
+
 	while (fread(&compraNovo, sizeof(Compra), 1, ptArq)){
         if(compraNovo.codigoCliente == codNovo){
             encontrou = 1;
@@ -564,9 +569,9 @@ void exclusaoLogicaCompra(){
         printf("2 - Desativar compra\n");
         printf("\nOpcao escolhida: ");
         scanf("%d", &opc);
-		
+
 		fseek(ptArq, pos, SEEK_SET);
-		
+
         if (opc == 1) {
 			if(compraNovo.ativo == 1){
 				printf("Cliente já está ativo!\n");
@@ -588,4 +593,35 @@ void exclusaoLogicaCompra(){
 
     fclose(ptArq);
 
+}
+
+// Funçao de busca por codigo do cliente
+ void busca_compra_especifica(){
+ FILE *pont_arq;
+ int cod_cliente,encontrou = 0;
+ Compra cod_cmp;
+    pont_arq = fopen("Compras.bin","r");
+
+  printf("\n------------------------------------------\n");
+    printf("        BUSCAR COMPRA ESPECIFICA         \n");
+    printf("------------------------------------------\n");
+    printf("Digite o codigo do cliente da compra: ");
+    scanf("%d", &cod_cliente);
+
+    if(pont_arq == NULL){
+		printf("Nenhuma compra cadastrado!\n");
+		return;
+	}
+
+	int pos = -1;
+	while (fread(&cod_cmp, sizeof(Compra), 1, pont_arq)){ //uso o cod_cmp para pegar um codigo de cliente no arquivo de compras
+        if(cod_cmp.codigoCliente == cod_cliente){ //Aqui eu comparo o codigo digitado pelo usuario com o codigo no arquivo
+            encontrou = 1;
+            pos = ftell(pont_arq) - sizeof(Compra);
+            break;
+        }
+    }
+     if(encontrou != -1){
+        printf("\n\nDados Encontrados: \nData da Compra: %s\nValor Total: %.2f\nForma de Pagamento: %s\nQuitada: %c\nCodigo do Cliente: %d\n\n", cod_cmp.dataCompra, cod_cmp.valorTotal, cod_cmp.formaPag, cod_cmp.quitada, cod_cmp.codigoCliente);
+       }
 }
