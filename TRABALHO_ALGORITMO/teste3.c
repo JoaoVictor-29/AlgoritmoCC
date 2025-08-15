@@ -599,7 +599,7 @@ int verificarCodigoCompra(int *codigoComp){
     int controle = 0, encontrou = 0;
     FILE *fc;
 
-    fc = fopen("Clientes.bin", "rb");
+    fc = fopen("Compras.bin", "rb");
     if (fc == NULL) {
         return -1;
     }
