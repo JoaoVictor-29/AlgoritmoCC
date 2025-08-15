@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
+#include <locale.h>//usar caracteres da nossa liingua
 
 //Estrutura de Clientes
 typedef struct{
@@ -22,6 +22,7 @@ typedef struct{
     char quitada;
     int codigoCliente;
     int ativo;
+    int codigoCompra;
 } Compra;
 
 // Protótipos das funções
@@ -31,6 +32,7 @@ void menuCompras();
 
 // Funções de Cliente
 void inserirCliente();
+int verificarCodigoCompra(int *codigoComp);
 void listarDadosClientes();
 void alterarDadosCliente();
 void exclusaoLogicaCliente();
@@ -43,12 +45,11 @@ void inserirCompra();
 void listarDadosCompras();
 void alterarDadosCompra();
 void exclusaoLogicaCompra();
-void busca_compra_especifica();
 
 int main(void) {
     setlocale(LC_ALL, "Portuguese");
     int opc;
-    do{
+    do{//loop que vai rodar o menu principal
         opc = menuPrincipal();
         if(opc == 1){
             menuClientes();
@@ -68,6 +69,8 @@ int main(void) {
     return 0;
 }
 
+//funcao principal do sistema
+//primeira que aparece
 int menuPrincipal(){
     int opc;
     printf("------------------------------------------\n");
@@ -82,6 +85,7 @@ int menuPrincipal(){
     return opc;
 }
 
+//menu se escolheu clientes
 void menuClientes(){
     int opc;
     do{
@@ -118,6 +122,7 @@ void menuClientes(){
     }while(opc != 5);
 }
 
+//menu se escolheu compras
 void menuCompras(){
     int opc;
     do{
@@ -129,8 +134,7 @@ void menuCompras(){
         printf("2 - Listar\n");
         printf("3 - Alterar dados da compra\n");
         printf("4 - Ativar / Desativar Cliente\n");
-        printf("5- Buscar compra especifica:\n");
-        printf("6 - Sair\n");
+        printf("5 - Sair\n");
         printf("\nOpcao Escolhida: ");
         scanf("%d", &opc);
 
@@ -147,33 +151,32 @@ void menuCompras(){
             exclusaoLogicaCompra();
         }
         else if(opc == 5){
-            busca_compra_especifica();
-        }
-        else if(opc == 6){
             printf("\nRetornando para o menu principal...\n\n");
         }
         else{
             printf("Opcao inválida!\n\n");
         }
-    }while(opc != 6);
+    }while(opc != 5);
 }
 
 void inserirCliente() {
-    FILE *fc;
+    FILE *fc;//ponteiro para o arquivo de clientes
     char cpfNovo[14];
     int codigoNovo;
-    Cliente novoCliente;
+    Cliente novoCliente;// guardar os dados antes de salvar
 
     printf("------------------------------------------\n");
     printf("          CADASTRO CLIENTE            \n");
     printf("------------------------------------------\n");
     printf("CPF: ");
     scanf("\n%[^\n]s", cpfNovo);
-
+	
+	//checar se o cpf é valido
     if (validaCPF(cpfNovo) == 0) {
         printf("CPF INVÁLIDO! (deve ter 11 dígitos e ser numérico)\n");
         return;
     }
+    //checa se já existe o cpf
     if (verificarCPFCliente(cpfNovo) != -1) {
         printf("O CPF digitado já está cadastrado no sistema!\n");
         return;
@@ -181,12 +184,13 @@ void inserirCliente() {
     strcpy(novoCliente.CPF, cpfNovo);
     printf("Código: ");
     scanf("\n%d", &codigoNovo);
-
+    
+    //checa se já existe o código
     if(verificarCodigoCliente(&codigoNovo) != - 1){
 		printf("Código já está cadastrado no sistema!\n");
 		return;
 	}
-	novoCliente.codigo = codigoNovo;
+	novoCliente.codigo = codigoNovo;// aqui atribui o código a estrutura
 
     printf("Nome: ");
     scanf("\n%[^\n]s", novoCliente.nome);
@@ -199,9 +203,11 @@ void inserirCliente() {
     novoCliente.ativo = 1;
 
     // Grava dados no arquivo
+    //Aqui tenta abrir o arquivo adicionando com "ab"
+    //se nao existir um arquivo ele cria
     fc = fopen("Clientes.bin", "ab");
     if (fc != NULL) {
-        fwrite(&novoCliente, sizeof(Cliente), 1, fc);
+        fwrite(&novoCliente, sizeof(Cliente), 1, fc);//escreve
         fclose(fc);
         printf("Cliente cadastrado com sucesso!\n");
     }
@@ -212,6 +218,7 @@ void inserirCliente() {
 
 int verificarCodigoCliente(int *codigoDigitado) {
     Cliente clienteCod;
+    //O controle serve pra saber a posição do cliente no arquivo e encontrou é uma flag
     int controle = 0, encontrou = 0;
     FILE *fc;
 
@@ -219,13 +226,14 @@ int verificarCodigoCliente(int *codigoDigitado) {
     if (fc == NULL) {
         return -1;
     }
-
+	
+	//loop para ler cada cliente no arquivo
     while (fread(&clienteCod, sizeof(Cliente), 1, fc)){
         if(clienteCod.codigo == *codigoDigitado){
             encontrou = 1;
             break;
         }
-        controle++;
+        controle++;//Aumenta o contador pra outra posição se nao encontrou
     }
     fclose(fc);
     if(encontrou == 1)
@@ -235,7 +243,8 @@ int verificarCodigoCliente(int *codigoDigitado) {
 }
 
 int verificarCPFCliente(char *cpfDigitado) {
-    Cliente clienteCpf;
+    Cliente clienteCpf;//Estrutura pra leitura
+    //Contador de posição e flag
     int controle = 0, encontrou = 0;
     FILE *fc;
 
@@ -243,9 +252,9 @@ int verificarCPFCliente(char *cpfDigitado) {
     if (fc == NULL) {
         return -1;
     }
-
-    while (fread(&clienteCpf, sizeof(Cliente), 1, fc)) {
-        if (strcmp(clienteCpf.CPF, cpfDigitado) == 0) {
+	//loop pra percorrer o arquivo
+    while (fread(&clienteCpf, sizeof(Cliente), 1, fc)){
+        if (strcmp(clienteCpf.CPF, cpfDigitado) == 0){//compara o cpf lido com o cpf que esta a procura
             encontrou = 1;
             break;
         }
@@ -259,12 +268,13 @@ int verificarCPFCliente(char *cpfDigitado) {
 }
 
 int validaCPF(char *cpf) {
-    int cont = 0;
+    int cont = 0;// contador para os dgitos
+    //esse for percorre cada caracter do cpf ate \0
     for (int i = 0; cpf[i] != '\0'; i++) {
-        if (cpf[i] >= '0' && cpf[i] <= '9') {
+        if (cpf[i] >= '0' && cpf[i] <= '9'){// aqui ve se o caracter é numero
             cont++;
         } else {
-            return 0;
+            return 0;//cpf invalido
         }
     }
     return cont == 11;
@@ -273,6 +283,7 @@ int validaCPF(char *cpf) {
 void listarDadosClientes(){
     Cliente cliente;
     FILE *ptarq;
+    //abre o arquivo para leitura binaria
     ptarq = fopen ("Clientes.bin", "rb");
     if (ptarq == NULL) {
         printf("Nenhum cliente cadastrado!\n\n");
@@ -281,6 +292,7 @@ void listarDadosClientes(){
     printf("\n------------------------------------------\n");
     printf("          CLIENTES CADASTRADOS           \n");
     printf("------------------------------------------\n");
+    //loop pra ler e mostrar os clientes
     while(fread(&cliente, sizeof (Cliente), 1, ptarq)){
 		if(cliente.ativo == 1)
 			printf("\nNome: %s\nCPF: %s\nCodigo: %d\nTelefone: %s\nData de Nascimento: %s\nEndereco: %s\n\n", cliente.nome, cliente.CPF, cliente.codigo, cliente.telefone, cliente.dataNasc, cliente.endereco);
@@ -291,28 +303,32 @@ void listarDadosClientes(){
 
 
 void alterarDadosCliente(){
-    int cod;
-    Cliente clienteAlt;
-    int controle;
-    int opc;
+    int cod;//codigo do cliente
+    Cliente clienteAlt;//estrutura
+    int controle;//guarda a posicao do cliente no arquivo
+    int opc;//opcao
 
     printf("\n------------------------------------------\n");
     printf("          ALTERAR DADOS DO CLIENTE           \n");
     printf("------------------------------------------\n");
     printf("Codigo do cliente: ");
     scanf("\n%d", &cod);
-    FILE *ptArq;
-    ptArq = fopen("Clientes.bin", "r+b");
+    FILE *ptArq;//ponteiro para o arquivo
+    ptArq = fopen("Clientes.bin", "r+b");//abre o arquivo para leitura e escrita
     if (ptArq == NULL) {
         printf("Nenhum registro está gravado no arquivo.\n");
         return;
     }
+    
+    //aqui busca o cliente e pega a posicao
     controle = verificarCodigoCliente(&cod);
     if(controle != -1){
+		//se o cliente foi encontrado posiciona o ponteeiro do arquivo
+		//no inicio do registro do cliente
         fseek(ptArq, (controle)*sizeof(Cliente), SEEK_SET);
-        fread(&clienteAlt, sizeof(Cliente), 1, ptArq);
+        fread(&clienteAlt, sizeof(Cliente), 1, ptArq);//le os dados atuais
         printf("\n\nDados Encontrados: \nNome: %s\nCPF: %s\nTelefone: %s\nData de Nascimento: %s\nEndereco: %s\n\n", clienteAlt.nome, clienteAlt.CPF, clienteAlt.telefone, clienteAlt.dataNasc, clienteAlt.endereco);
-        printf("Qual dado do cliente você deseja alterar (exceto CPF)\n");
+        printf("Qual dado do cliente você deseja alterar\n");
         printf("1 - Nome\n");
         printf("2 - Telefone\n");
         printf("3 - Data de Nascimento\n");
@@ -339,6 +355,9 @@ void alterarDadosCliente(){
         } else{
             printf("Opcao inválida!\n");
         }
+        
+        //volta o ponteiro do arquivo para a posicao certa e escreve os dados atualizados
+        //e com isso sobrescreve o registro antigo
         fseek(ptArq, controle * sizeof(Cliente), SEEK_SET);
         fwrite (&clienteAlt, sizeof(Cliente), 1, ptArq);
         printf("Dados atualizados com sucesso!\n");
@@ -351,30 +370,30 @@ void alterarDadosCliente(){
 
 void exclusaoLogicaCliente(){
 	int codNovo, encontrou = 0, opc;
-	long int pos;
+	long int pos;//vai guardar a posicao do cliente no arquivo
 	Cliente clienteNovo;
 	FILE *ptArq;
-
+	
 	printf("\n------------------------------------------\n");
     printf("        ATIVAR / DESATIVAR CLIENTE         \n");
     printf("------------------------------------------\n");
     printf("Digite o codigo do cliente: ");
     scanf("%d", &codNovo);
-
-    ptArq = fopen("Clientes.bin", "r+b");
+    
+    ptArq = fopen("Clientes.bin", "r+b");//abre o arquivo p/leitura-escrita
     if(ptArq == NULL){
 		printf("Nenhum cliente cadastrado!\n");
 		return;
 	}
-
+	//percorre o arquivo
 	while (fread(&clienteNovo, sizeof(Cliente), 1, ptArq)){
         if(clienteNovo.codigo == codNovo){
-            encontrou = 1;
-            pos = ftell(ptArq) - sizeof(Cliente);
+            encontrou = 1;//flag
+            pos = ftell(ptArq) - sizeof(Cliente);//aqui calcula a posicao dele no arquivo
             break;
         }
     }
-
+	
     if(encontrou){
         printf("\n\nCliente encontrado: \n%s\n", clienteNovo.nome);
         printf("O que deseja fazer?\n");
@@ -382,9 +401,10 @@ void exclusaoLogicaCliente(){
         printf("2 - Desativar cliente\n");
         printf("\nOpcao escolhida: ");
         scanf("%d", &opc);
-
+		
+		//volta o ponteiro para a posicao do cliente
 		fseek(ptArq, pos, SEEK_SET);
-
+		
         if (opc == 1) {
 			if(clienteNovo.ativo == 1){
 				printf("Cliente já está ativo!\n");
@@ -413,13 +433,15 @@ void inserirCompra() {
     FILE *fcomp;
     Compra novaCompra;
     int codCliente;
+    int codigoNovo;
 
     printf("------------------------------------------\n");
     printf("          CADASTRO COMPRA            \n");
     printf("------------------------------------------\n");
     printf("Código do cliente associado a esta compra: ");
     scanf("\n%d", &codCliente);
-
+	
+	//verifica se o cliente com codigo existe
     int clienteCodigo = verificarCodigoCliente(&codCliente);
     if (clienteCodigo == -1) {
         printf("Cliente com o código %d não encontrado. Cadastre o cliente primeiro.\n", codCliente);
@@ -427,6 +449,16 @@ void inserirCompra() {
     }
 
     // Preencher os dados da compra
+    printf("Código da compra: ");
+    scanf("\n%d", &codigoNovo);
+    
+    if(verificarCodigoCompra(&codigoNovo) != - 1){
+		printf("Código já está cadastrado no sistema!\n");
+		return;
+	}
+	
+	novaCompra.codigoCompra = codigoNovo;// aqui atribui o código a estrutura
+	
     printf("Data da Compra (DD/MM/AAAA): ");
     scanf("\n%[^\n]s", novaCompra.dataCompra);
     printf("Valor Total: ");
@@ -436,12 +468,12 @@ void inserirCompra() {
     printf("A compra está quitada? (S/N): ");
     scanf("\n%c", &novaCompra.quitada);
     novaCompra.codigoCliente = clienteCodigo; // Associar a compra ao cliente pelo código
-    novaCompra.ativo = 1;
+    novaCompra.ativo = 1;//a compra  já comeca como ativa
 
     // Grava dados no arquivo
     fcomp = fopen("Compras.bin", "ab");
     if (fcomp != NULL) {
-        fwrite(&novaCompra, sizeof(Compra), 1, fcomp);
+        fwrite(&novaCompra, sizeof(Compra), 1, fcomp);//escreve no arquivo
         fclose(fcomp);
         printf("Compra cadastrada com sucesso!\n");
     }
@@ -450,10 +482,36 @@ void inserirCompra() {
     }
 }
 
+int verificarCodigoCompra(int *codigoComp){
+    Compra compraCod;
+    //O controle serve pra saber a posição do cliente no arquivo e encontrou é uma flag
+    int controle = 0, encontrou = 0;
+    FILE *fc;
+
+    fc = fopen("Clientes.bin", "rb");
+    if (fc == NULL) {
+        return -1;
+    }
+	
+	//loop para ler cada cliente no arquivo
+    while (fread(&compraCod, sizeof(Compra), 1, fc)){
+        if(compraCod.codigoCompra == *codigoComp){
+            encontrou = 1;
+            break;
+        }
+        controle++;//Aumenta o contador pra outra posição se nao encontrou
+    }
+    fclose(fc);
+    if(encontrou == 1)
+        return controle;
+    else
+        return -1;
+}
+
 void listarDadosCompras(){
-    Compra compra;
-    FILE *ptarq;
-    ptarq = fopen ("Compras.bin", "rb");
+    Compra compra;//estrutura
+    FILE *ptarq;//ponteiro arquivo
+    ptarq = fopen ("Compras.bin", "rb");//abre para leitura binaria
     if (ptarq == NULL) {
         printf("Nenhuma compra cadastrada!\n\n");
         return;
@@ -461,9 +519,10 @@ void listarDadosCompras(){
     printf("\n------------------------------------------\n");
     printf("          COMPRAS CADASTRADAS           \n");
     printf("------------------------------------------\n");
+    //loop para mostrar as compras
     while(fread(&compra, sizeof (Compra), 1, ptarq)){
 		if(compra.ativo == 1)
-			printf("\nData da Compra: %s\nValor Total: %.2f\nForma de Pagamento: %s\nQuitada: %c\nCodigo do Cliente: %d\n\n", compra.dataCompra, compra.valorTotal, compra.formaPag, compra.quitada, compra.codigoCliente);
+			printf("\nData da Compra: %s\nValor Total: %.2f\nForma de Pagamento: %s\nQuitada: %c\nCodigo do Cliente: %d\nCodigo da compra: %d\n\n", compra.dataCompra, compra.valorTotal, compra.formaPag, compra.quitada, compra.codigoCliente, compra.codigoCompra);
     }
     printf("------------------------------------------\n\n");
     fclose (ptarq);
@@ -471,28 +530,28 @@ void listarDadosCompras(){
 
 
 void alterarDadosCompra(){
-    int codigoClienteNovo;
-    Compra compraNovo;
-    int controle = -1;
+    int codigoCompraNovo;
+    Compra compraNovo;//estrutura
+    int controle = -1;//flag
     int opcao;
 
     printf("\n------------------------------------------\n");
     printf("          ALTERAR DADOS DA COMPRA           \n");
     printf("------------------------------------------\n");
-    printf("Código do cliente associado a compra: ");
-    scanf("%d", &codigoClienteNovo);
-    FILE *ptArq;
-    ptArq = fopen("Compras.bin", "r+b");
+    printf("Código da compra: ");
+    scanf("%d", &codigoCompraNovo);
+    FILE *ptArq;//ponteiro para o arquivo
+    ptArq = fopen("Compras.bin", "r+b");//abre pra leitura e escrita binaria
     if (ptArq == NULL) {
         printf("Nenhum registro está gravado no arquivo.\n");
         return;
     }
 
-    int pos = -1;
+    int pos = -1;//guarda a posicao da compra no arquivo
     while (fread(&compraNovo, sizeof(Compra), 1, ptArq)) {
-        if (compraNovo.codigoCliente == codigoClienteNovo) {
+        if (compraNovo.codigoCompra == codigoCompraNovo) {
             controle = 0;
-            pos = ftell(ptArq) - sizeof(Compra);
+            pos = ftell(ptArq) - sizeof(Compra);//calcular a posicao
             break;
         }
     }
@@ -526,8 +585,8 @@ void alterarDadosCompra(){
         } else{
             printf("Opcao inválida!\n");
         }
-        fseek(ptArq, pos, SEEK_SET);
-        fwrite (&compraNovo, sizeof(Compra), 1, ptArq);
+        fseek(ptArq, pos, SEEK_SET);//volta o ponteiro para a posicao da compra
+        fwrite (&compraNovo, sizeof(Compra), 1, ptArq);//escreve os novos dados
         printf("Dados atualizados com sucesso!\n");
     }
     else {
@@ -546,7 +605,7 @@ void exclusaoLogicaCompra(){
 	printf("\n------------------------------------------\n");
     printf("        ATIVAR / DESATIVAR COMPRA         \n");
     printf("------------------------------------------\n");
-    printf("Digite o codigo do cliente da compra: ");
+    printf("Digite o codigo da compra: ");
     scanf("%d", &codNovo);
     
     //Tenta abrir o arquivo de compras.bin para ler e escrever
@@ -560,7 +619,7 @@ void exclusaoLogicaCompra(){
 	//Aqui vai andar pelo arquivo, lendo as compras
 	//até encontrar o código
 	while (fread(&compraNovo, sizeof(Compra), 1, ptArq)){
-        if(compraNovo.codigoCliente == codNovo){
+        if(compraNovo.codigoCompra == codNovo){
             encontrou = 1;//Marca como encontrado (1)
             //Aí calcula a posição da compra no arquivo com o ftell
             //ftell diz onde o ponteiro está, e a gente subtrai o tam da compra
@@ -604,7 +663,6 @@ void exclusaoLogicaCompra(){
     fclose(ptArq);
 
 }
-
 // Funçao de busca por codigo do cliente
  void busca_compra_especifica(){
  FILE *pont_arq;
