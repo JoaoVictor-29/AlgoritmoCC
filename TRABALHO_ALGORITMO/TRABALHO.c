@@ -333,6 +333,7 @@ void alterarDadosCliente(){
         printf("2 - Telefone\n");
         printf("3 - Data de Nascimento\n");
         printf("4 - Endereco\n");
+        printf("5 - CPF\n");
         printf("\nOpcao escolhida: ");
         scanf("%d", &opc);
 
@@ -352,7 +353,10 @@ void alterarDadosCliente(){
             printf("Digite o novo endereco: ");
             scanf("\n%[^\n]", clienteAlt.endereco);
             printf("Endereco alterado com sucesso!\n");
-        } else{
+		}else if(opc == 5) {
+			printf("Digite o novo CPF: ");
+			scanf("\n%[^\n]", clienteAlt.CPF);
+        }else{
             printf("Opcao inválida!\n");
         }
         
@@ -367,7 +371,6 @@ void alterarDadosCliente(){
     }
     fclose(ptArq);
 }
-
 void exclusaoLogicaCliente(){
 	int codNovo, encontrou = 0, opc;
 	long int pos;//vai guardar a posicao do cliente no arquivo
