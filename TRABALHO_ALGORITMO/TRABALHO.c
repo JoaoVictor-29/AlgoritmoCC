@@ -541,27 +541,36 @@ void exclusaoLogicaCompra(){
 	long int pos;
 	Compra compraNovo;
 	FILE *ptArq;
-
+	
+	//Aqui a gente pede pro usuário o código do cliente da compra
 	printf("\n------------------------------------------\n");
     printf("        ATIVAR / DESATIVAR COMPRA         \n");
     printf("------------------------------------------\n");
     printf("Digite o codigo do cliente da compra: ");
     scanf("%d", &codNovo);
-
+    
+    //Tenta abrir o arquivo de compras.bin para ler e escrever
+    //r+b tem a função de ler e escrever em bináario
     ptArq = fopen("Compras.bin", "r+b");
     if(ptArq == NULL){
 		printf("Nenhuma compra cadastrado!\n");
 		return;
 	}
-
+	
+	//Aqui vai andar pelo arquivo, lendo as compras
+	//até encontrar o código
 	while (fread(&compraNovo, sizeof(Compra), 1, ptArq)){
         if(compraNovo.codigoCliente == codNovo){
-            encontrou = 1;
+            encontrou = 1;//Marca como encontrado (1)
+            //Aí calcula a posição da compra no arquivo com o ftell
+            //ftell diz onde o ponteiro está, e a gente subtrai o tam da compra
+            //pra voltar no início dela
             pos = ftell(ptArq) - sizeof(Compra);
             break;
         }
     }
-
+	
+	// Aqui se encontrou
     if(encontrou){
         printf("\n\nCompra encontrada: \n%2.f\n", compraNovo.valorTotal);
         printf("O que deseja fazer?\n");
@@ -569,9 +578,10 @@ void exclusaoLogicaCompra(){
         printf("2 - Desativar compra\n");
         printf("\nOpcao escolhida: ");
         scanf("%d", &opc);
-
+		
+		//Ai aqui volta o ponteiro pra posição da compra que achou
 		fseek(ptArq, pos, SEEK_SET);
-
+		
         if (opc == 1) {
 			if(compraNovo.ativo == 1){
 				printf("Cliente já está ativo!\n");
