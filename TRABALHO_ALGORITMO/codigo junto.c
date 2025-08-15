@@ -530,7 +530,7 @@ void inserirCompra() {
     scanf("\n%[^\n]s", novaCompra.formaPag);
     printf("A compra está quitada? (S/N): ");
     scanf("\n%c", &novaCompra.quitada);
-    novaCompra.codigoCliente = clienteCodigo; // Associar a compra ao cliente pelo código
+    novaCompra.codigoCliente = codCliente; // Associar a compra ao cliente pelo código
     novaCompra.ativo = 1;//a compra  já comeca como ativa
 
     // Grava dados no arquivo
@@ -551,7 +551,7 @@ int verificarCodigoCompra(int *codigoComp){
     int controle = 0, encontrou = 0;
     FILE *fc;
 
-    fc = fopen("Clientes.bin", "rb");
+    fc = fopen("Compras.bin", "rb");
     if (fc == NULL) {
         return -1;
     }
